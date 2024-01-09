@@ -104,31 +104,31 @@ app.post("/upload", express.json(), async (req, res) => {
 
       // Delete the file
     }
-    try {
-      var links = await generateDownloadLinks(
-        ensureDirectoryExists(`../csv_files/${agencyId}`)
-      );
-      console.log(links);
-      for (const link of links) {
-        let data = {
-          link: link,
-          del: agencyId,
-        };
-        try {
-          var res = await axios.post(
-            link,
-            data
-          );
-        } catch (error) {
-          console.log(error);
-          console.log("upoload link failed");
-        }
-      }
-      console.log(links);
-    } catch (error) {
-      console.log(error);
-      console.log('error generating links');
-    }
+    // try {
+    //   var links = await generateDownloadLinks(
+    //     ensureDirectoryExists(`../csv_files/${agencyId}`)
+    //   );
+    //   console.log(links);
+    //   for (const link of links) {
+    //     let data = {
+    //       link: link,
+    //       del: agencyId,
+    //     };
+    //     try {
+    //       var res = await axios.post(
+    //         link,
+    //         data
+    //       );
+    //     } catch (error) {
+    //       console.log(error);
+    //       console.log("upoload link failed");
+    //     }
+    //   }
+    //   console.log(links);
+    // } catch (error) {
+    //   console.log(error);
+    //   console.log('error generating links');
+    // }
    
     // await sendFiles(ensureDirectoryExists(`../csv_files/${agencyId}`));
   } else {
