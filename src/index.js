@@ -14,7 +14,11 @@ const axios = require("axios");
 const ensureDirectoryExists = require("./directory_creator.js");
 const generateDownloadLinks = require("./generate_download_links.js");
 const { dataRoute } = require('./data_route.js');
-const port = 3000;
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const port = process.env.PORT || 3000;
 
 app.use(express.static(__dirname));
 app.use(express.json());
