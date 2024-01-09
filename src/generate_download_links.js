@@ -8,8 +8,8 @@ module.exports = async function generateDownloadLinks(folderPath, excludeFiles =
         reject(err);
       } else {
         const downloadLinks = files
-          .filter(file => !excludeFiles.includes(file))
-          .map(file => path.join(folderPath, file));
+          .filter(file => !excludeFiles.includes(path.basename(file, '.csv')))  
+          .map(file => path.join(folderPath, file)); 
         resolve(downloadLinks);
       }
     });
