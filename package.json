@@ -1,0 +1,27 @@
+{
+  "name": "excel_convert",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "cors": "^2.8.5",
+    "csv-writer": "^1.6.0",
+    "env": "^0.0.2",
+    "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.0.2",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "uuid": "^9.0.1",
+    "xlsx-stream-reader": "^1.1.1"
+  }
+}
