@@ -144,7 +144,7 @@ app.post("/upload", express.json(), async (req, res) => {
 
 
 
-app.timeout = 300000;
+app.timeout = 1000000; 
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
