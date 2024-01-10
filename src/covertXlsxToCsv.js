@@ -20,21 +20,17 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
     workBookReader.on("worksheet", function (workSheetReader) {
 
       worksheetId++;
-      // if (workSheetReader.id > 1) {
-      //   // we only want first sheet
-      //   workSheetReader.skip();
-      //   return;
-      // }
       let csvWriter;
 
       var titles = [];
       let records = [];
       var isTitleStored = false;
+      var isCalledEnd = false;
 
       var path = `${ensureDirectoryExists(
         `../csv_files/${agencyId}`
       )}/${fileName}_______id${worksheetId}.csv`;
-      workSheetReader.on("row", async function (row) {
+      workSheetReader.on("row", function (row) {
         if (!isTitleStored) {
           titles = row.values;
           csvWriter = createCsvWriter({
@@ -43,9 +39,8 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
           });
           isTitleStored = true;
         } else {
-          if(records.length > 300) {
-            await csvWriter.writeRecords(records);
-            console.log('exceed 300 row created a csv file');
+          if(records.length > 1000) {
+            csvWriter.writeRecords(records);
             records = [];
             worksheetId++;
             path = `${ensureDirectoryExists(
@@ -61,9 +56,22 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
       });
 
       workSheetReader.on("end", async function () {
-        await csvWriter.writeRecords(records);
-        console.log(workSheetReader.rowCount);
-        records = [];
+        if(csvWriter === undefined) { 
+          
+          if(records > 0) {
+            csvWriter = createCsvWriter({
+              header: titles,
+              path: path,
+            });
+            csvWriter.writeRecords(records);
+            records = [];
+          }
+          
+        } else {
+          csvWriter.writeRecords(records);
+          records = [];
+        }
+        
       });
 
       // call process after registering handlers
@@ -77,7 +85,3 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
     fs.createReadStream(inputFilePath).pipe(workBookReader);
   });
 };
-
-// streamReadExcel(
-//   "C:\\Users\\safva\\OneDrive\\Desktop\\starkin_projects\\excel_convert\\data.xlsx"
-// );
