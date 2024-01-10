@@ -43,6 +43,19 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
           });
           isTitleStored = true;
         } else {
+          if(records.length > 300) {
+            await csvWriter.writeRecords(records);
+            console.log('exceed 300 row created a csv file');
+            records = [];
+            worksheetId++;
+            path = `${ensureDirectoryExists(
+              `../csv_files/${agencyId}`
+            )}/${fileName}_______id${worksheetId}.csv`;
+            csvWriter = createCsvWriter({
+              header: titles,
+              path: path,
+            });
+          } 
           records.push(row.values);
         }
       });
