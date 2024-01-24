@@ -39,6 +39,8 @@ app.post("/upload", express.json(), async (req, res) => {
   const agencyId = req.body.agencyId;
   if (fileLinks && fileLinks.length > 0) {
     // console.log(fileLinks);
+    let filepath;
+    let filename;
     try {
       for (const fileLink of fileLinks) {
         // Download each file
@@ -50,10 +52,10 @@ app.post("/upload", express.json(), async (req, res) => {
             timeout: 60000,
           });
           // Create a unique filename for the downloaded file
-          const filename = path.basename(fileLink, '.xlsx');
+           filename = path.basename(fileLink, '.xlsx');
           // const filename = uuidv4() + path.extname(fileLink);
           // const filepath = path.join(__dirname, 'uploads', filename);
-          const filepath =
+           filepath =
             ensureDirectoryExists(`../uploads/${agencyId}/`) + filename;
 
           // Stream the file to the filesystem
@@ -90,23 +92,16 @@ app.post("/upload", express.json(), async (req, res) => {
     const files = fs.readdirSync(
       ensureDirectoryExists(`../uploads/${agencyId}/`)
     );
-    for (const file of files) {
-      const filePath = path.join(
-        ensureDirectoryExists(`../uploads/${agencyId}/`),
-        file
-      );
-      // Call your async function here
-      try {
-        await xlsxToCsv(filePath, file, agencyId);
-        console.log(`${filePath} coverted successfully`);
-        fs.unlinkSync(filePath);
-      } catch (err) {
-        console.log(`error converting ${filePath}`);
 
-        console.log(err);
-      }
+    // Call your async function here
+    try {
+      await xlsxToCsv(filepath, filename, agencyId); 
+      console.log(`${filepath} coverted successfully`);
+      fs.unlinkSync(filepath);
+    } catch (err) {
+      console.log(`error converting ${filepath}`);
 
-      // Delete the file
+      console.log(err);
     }
     // try {
     //   var links = await generateDownloadLinks(
