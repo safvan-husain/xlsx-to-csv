@@ -13,8 +13,12 @@ const { log } = require("console");
 const axios = require("axios");
 const ensureDirectoryExists = require("./directory_creator.js");
 const generateDownloadLinks = require("./generate_download_links.js");
-const { dataRoute } = require('./data_route.js');
-const dotenv = require('dotenv');
+const { dataRoute } = require("./data_route.js");
+const dotenv = require("dotenv");
+const MyRemoteSql = require("./db/mysql_helper.js");
+const { json } = require("body-parser");
+
+const database = MyRemoteSql.getInstance();
 
 dotenv.config();
 
@@ -23,7 +27,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static(__dirname));
 app.use(express.json());
 app.use(cors());
-app.use(dataRoute)
+app.use(dataRoute);
 
 const upload = multer({ dest: "uploads/" });
 
@@ -52,10 +56,9 @@ app.post("/upload", express.json(), async (req, res) => {
             timeout: 60000,
           });
           // Create a unique filename for the downloaded file
-           filename = path.basename(fileLink, '.xlsx');
-          // const filename = uuidv4() + path.extname(fileLink);
-          // const filepath = path.join(__dirname, 'uploads', filename);
-           filepath =
+          filename = path.basename(fileLink, ".xlsx");
+
+          filepath =
             ensureDirectoryExists(`../uploads/${agencyId}/`) + filename;
 
           // Stream the file to the filesystem
@@ -78,9 +81,6 @@ app.post("/upload", express.json(), async (req, res) => {
             console.error("Error downloading file:", error);
           }
         }
-
-        //     // Perform operations on the downloaded file here
-        //     // ...
       }
       res.status(200).send("Congrats, files downloaded and processed");
     } catch (error) {
@@ -88,14 +88,8 @@ app.post("/upload", express.json(), async (req, res) => {
       res.status(500).send("Error downloading files");
     }
 
-    // Get all files in the directory
-    const files = fs.readdirSync(
-      ensureDirectoryExists(`../uploads/${agencyId}/`)
-    );
-
-    // Call your async function here
     try {
-      await xlsxToCsv(filepath, filename, agencyId); 
+      await xlsxToCsv(filepath, filename, agencyId);
       console.log(`${filepath} coverted successfully`);
       fs.unlinkSync(filepath);
     } catch (err) {
@@ -103,33 +97,6 @@ app.post("/upload", express.json(), async (req, res) => {
 
       console.log(err);
     }
-    // try {
-    //   var links = await generateDownloadLinks(
-    //     ensureDirectoryExists(`../csv_files/${agencyId}`)
-    //   );
-    //   console.log(links);
-    //   for (const link of links) {
-    //     let data = {
-    //       link: link,
-    //       del: agencyId,
-    //     };
-    //     try {
-    //       var res = await axios.post(
-    //         link,
-    //         data
-    //       );
-    //     } catch (error) {
-    //       console.log(error);
-    //       console.log("upoload link failed");
-    //     }
-    //   }
-    //   console.log(links);
-    // } catch (error) {
-    //   console.log(error);
-    //   console.log('error generating links');
-    // }
-   
-    // await sendFiles(ensureDirectoryExists(`../csv_files/${agencyId}`));
   } else {
     res.status(400).json({ message: "No file links provided" });
   }
@@ -137,10 +104,50 @@ app.post("/upload", express.json(), async (req, res) => {
   console.timeEnd("Total Time");
 });
 
+app.post("/search-vn", async (req, res) => {
+  const { vehicleNumber, agencyId } = req.body;
+  try {
+    var data = await database.getDataByVehicleNumber(vehicleNumber, agencyId);
 
+    res.status(200).json(data.map((e) => JSON.parse(e.details)));
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
 
-app.timeout = 1000000; 
+app.post("/search-cn", async (req, res) => {
+  const { chassiNumber, agencyId } = req.body;
+  try {
+    var data = await database.getDataByChassiNumber(chassiNumber, agencyId);
 
-app.listen(port, () => {
+    res.status(200).json(data.map((e) => JSON.parse(e.details)));
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+app.post("/delete-vn", async (req, res) => {
+  const { chassiNumber, agencyId } = req.body;
+
+  try {
+    await database.deleteMatchingRecordsWithVehicleNo(chassiNumber, agencyId);
+    res.status(200).json({ message: "success" });
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+app.post("/search-cn", async (req, res) => {
+  const { chassiNumber, agencyId } = req.body;
+  try {
+    await database.deleteMatchingRecordsWithChassiNo(chassiNumber, agencyId);
+    res.status(200).json({ message: "success" });
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+
+app.timeout = 1000000;
+
+app.listen(port, async () => {
+  await database.initialize();
   console.log(`Server listening at http://localhost:${port}`);
 });

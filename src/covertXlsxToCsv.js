@@ -5,6 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const ensureDirectoryExists = require("./directory_creator.js");
 const getMemoryUsage = require('./get_memory_usage.js')
+const MyRemoteSql = require('./db/mysql_helper.js')
+
+const database = MyRemoteSql.getInstance();
 
 module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
   getMemoryUsage();
@@ -40,6 +43,7 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
           isTitleStored = true;
         } else {
           if(records.length > 1000) {
+            database.addRecords(records, titles,agencyId,fileName );
             csvWriter.writeRecords(records);
             records = [];
             worksheetId++;
@@ -68,6 +72,7 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName,agencyId) {
           }
           
         } else {
+          database.addRecords(records, titles,agencyId, fileName );
           csvWriter.writeRecords(records);
           records = [];
         }
