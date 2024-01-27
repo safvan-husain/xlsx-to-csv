@@ -126,16 +126,16 @@ app.post("/search-cn", async (req, res) => {
   }
 });
 app.post("/delete-vn", async (req, res) => {
-  const { chassiNumber, agencyId } = req.body;
+  const { vehicleNumber, agencyId } = req.body;
 
   try {
-    await database.deleteMatchingRecordsWithVehicleNo(chassiNumber, agencyId);
+    await database.deleteMatchingRecordsWithVehicleNo(vehicleNumber, agencyId);
     res.status(200).json({ message: "success" });
   } catch (error) {
     res.status(500).json({ message: error });
   }
 });
-app.post("/search-cn", async (req, res) => {
+app.post("/delete-cn", async (req, res) => {
   const { chassiNumber, agencyId } = req.body;
   try {
     await database.deleteMatchingRecordsWithChassiNo(chassiNumber, agencyId);
@@ -149,5 +149,6 @@ app.timeout = 1000000;
 
 app.listen(port, async () => {
   await database.initialize();
+  //  database.logAllDataFromTable();
   console.log(`Server listening at http://localhost:${port}`);
 });

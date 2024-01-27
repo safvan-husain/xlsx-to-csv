@@ -14,11 +14,11 @@ class MyRemoteSql {
 
   databaseName = "starkina_recovery";
 
-  vehicleNo = 'vehicleNumber';
-  chassNo = 'chassiNo';
-  details = 'details'
-  agencyId = 'agencyId';
-  fileName = 'fileName';
+  vehicleNo = "vehicleNumber";
+  chassNo = "chassiNo";
+  details = "details";
+  agencyId = "agencyId";
+  fileName = "fileName";
 
   connection = mysql.createConnection({
     host: "85.187.128.49",
@@ -31,18 +31,20 @@ class MyRemoteSql {
 
   async connect() {
     return new Promise((res, rej) => {
-      this.connection.connect(function (err, result) {
-        if (err) {
-          rej(err);
-        } else {
-          // var sql = "DROP TABLE vehicle_details";
-          // this.connection.query(sql, function (err, result) {
-          //    if (err) throw err;
-          //    console.log("Table deleted");
-          // });
-          res(result);
-        }
-      }.bind(this));
+      this.connection.connect(
+        function (err, result) {
+          if (err) {
+            rej(err);
+          } else {
+            // var sql = "DROP TABLE vehicle_details";
+            // this.connection.query(sql, function (err, result) {
+            //    if (err) throw err;
+            //    console.log("Table deleted");
+            // });
+            res(result);
+          }
+        }.bind(this)
+      );
     });
   }
 
@@ -72,7 +74,8 @@ class MyRemoteSql {
           if (err) {
             reject(err);
           } else {
-            resolve(results); 
+            resolve(results);
+            console.log(results);
           }
         }
       );
@@ -82,7 +85,7 @@ class MyRemoteSql {
   async getDataByVehicleNumber(vehicleNo, agencyId) {
     return new Promise((resolve, reject) => {
       this.connection.query(
-        `SELECT ${this.details} FROM ${this.tableName} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`, 
+        `SELECT ${this.details} FROM ${this.tableName} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`,
         [vehicleNo, agencyId],
         (err, results) => {
           if (err) {
@@ -138,7 +141,7 @@ class MyRemoteSql {
   }
 
   async addRecords(rows, titles, agencyId, fileName) {
-    let sql = `INSERT INTO ${this.tableName} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.agencyId}) VALUES ?`;
+    let sql = `INSERT INTO ${this.tableName} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
     // let values = jsonList.map(json => [json['ve'], json['ch'], JSON.stringify(json), agencyId]);
     let values = rows.map((row) => {
       var json = {};
@@ -149,26 +152,32 @@ class MyRemoteSql {
         json[title] = item;
       }
 
+      var content = fileName.split("______");
+      json["file name"] = content[0];
+      json["finance"] = content[1];
+      json["branch"] = content[2];
+
+      var vehicleNumber = json["VEHICAL NO"];
+
       return [
         //taking the last 4 char of the vehicle number.
-        json["VEHICAL NO"].slice(-4),
+        typeof vehicleNumber === "string" ? vehicleNumber.slice(-4) : undefined,
         json["CHASSIS NO"],
         JSON.stringify(json),
         fileName,
         agencyId,
       ];
-    });   
- 
+    });
+
     values = values.filter((v) => {
-      if(v[0] === undefined && v[1] === undefined) {
+      if (v[0] === undefined && v[1] === undefined) {
         return false;
       }
       return true;
-    });  
-
+    });
 
     return new Promise((resolve, reject) => {
-      if(values.length > 0) {
+      if (values.length > 0) {
         this.connection.query(sql, [values], function (err, result) {
           if (err) {
             reject(err);
@@ -179,8 +188,7 @@ class MyRemoteSql {
       } else {
         resolve();
       }
-      
-    }); 
+    });
   }
 
   async deleteMatchingRecordsWithVehicleNo(vehicleNo, agencyId) {
@@ -194,7 +202,7 @@ class MyRemoteSql {
         }
       });
     });
-  } 
+  }
 
   async deleteMatchingRecordsWithChassiNo(chassNo, agencyId) {
     const sql = `DELETE FROM ${this.tableName} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`;
@@ -207,7 +215,7 @@ class MyRemoteSql {
         }
       });
     });
-  } 
+  }
 
   async deleteAllOfaSingleAgency(agencyId) {
     const sql = `DELETE FROM ${this.tableName} WHERE ${this.agencyId} = ?`;
@@ -221,18 +229,18 @@ class MyRemoteSql {
       });
     });
   }
-  async  deleteAllRecords() {
+  async deleteAllRecords() {
     const sql = `DELETE FROM ${this.tableName}`;
     return new Promise((resolve, reject) => {
-       this.connection.query(sql, (error, results) => {
-         if (error) {
-           reject(error);
-         } else {
-           resolve(results);
-         }
-       });
+      this.connection.query(sql, (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
     });
-   }
-} 
+  }
+}
 
 module.exports = MyRemoteSql;
