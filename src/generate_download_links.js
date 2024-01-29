@@ -7,6 +7,8 @@ module.exports = async function generateDownloadLinks(folderPath, excludeFiles =
       if (err) {
         reject(err);
       } else {
+        console.log(files);
+        console.log(excludeFiles);
         const downloadLinks = files
           .filter(file => !excludeFiles.includes(path.basename(file, '.csv')))  
           .map(file => path.join(folderPath, file)); 

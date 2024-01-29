@@ -30,223 +30,218 @@ class MyRemoteSql {
   });
 
   async connect() {
-    return new Promise((res, rej) => {
-      this.connection.connect(
-        function (err, result) {
-          if (err) {
-            rej(err);
-          } else {
-            // var sql = "DROP TABLE vehicle_details";
-            // this.connection.query(sql, function (err, result) {
-            //    if (err) throw err;
-            //    console.log("Table deleted");
-            // });
-            res(result);
-          }
-        }.bind(this)
-      );
-    });
+    // return new Promise((res, rej) => {
+    //   this.connection.connect(
+    //     function (err, result) {
+    //       if (err) {
+    //         rej(err);
+    //       } else {
+    //         res(result);
+    //       }
+    //     }.bind(this)
+    //   );
+    // });
   }
 
   async createTable(agencyId) {
-    return new Promise((res, rej) => {
-      this.connection.query(
-        `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
-        async function (err, results) {
-          if (err) rej(err);
-          if (results[0]["COUNT(*)"] > 0) {
-            console.log("table exist");
-            // await this.logAllDataFromTable();
-            res();
-          } else {
-            this.connection.query(
-              `CREATE TABLE ${this.tableName+agencyId} (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              ${this.vehicleNo} VARCHAR(255),
-              ${this.chassNo} VARCHAR(255),
-              ${this.details} JSON,
-              ${this.fileName} VARCHAR(255),
-              ${this.agencyId} VARCHAR(255)
-          )`,
-              function (err, results) {
-                if (err) rej(err);
-                res(results);
-              }
-            );
-            res();
-          }
-        }.bind(this)
-      );
-    });
+    // return new Promise((res, rej) => {
+    //   this.connection.query(
+    //     `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
+    //     async function (err, results) {
+    //       if (err) rej(err);
+    //       if (results[0]["COUNT(*)"] > 0) {
+    //         console.log("table exist");
+    //         // await this.logAllDataFromTable();
+    //         res();
+    //       } else {
+    //         this.connection.query(
+    //           `CREATE TABLE ${this.tableName+agencyId} (
+    //           id INT AUTO_INCREMENT PRIMARY KEY,
+    //           ${this.vehicleNo} VARCHAR(255),
+    //           ${this.chassNo} VARCHAR(255),
+    //           ${this.details} JSON,
+    //           ${this.fileName} VARCHAR(255),
+    //           ${this.agencyId} VARCHAR(255)
+    //       )`,
+    //           function (err, results) {
+    //             if (err) rej(err);
+    //             res(results);
+    //           }
+    //         );
+    //         res();
+    //       }
+    //     }.bind(this)
+    //   );
+    // });
   }
 
   async logAllDataFromTable(agencyId) {
-    await this.createTable(agencyId);
-    return new Promise((resolve, reject) => {
-      this.connection.query(
-        `SELECT * FROM ${this.tableName+agencyId}`,
-        (err, results) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-            console.log(results);
-          }
-        }
-      );
-    });
+    // await this.createTable(agencyId);
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(
+    //     `SELECT * FROM ${this.tableName+agencyId}`,
+    //     (err, results) => {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(results);
+    //         console.log(results);
+    //       }
+    //     }
+    //   );
+    // });
   }
 
   async getDataByVehicleNumber(vehicleNo, agencyId) {
-    await this.createTable(agencyId);
-    return new Promise((resolve, reject) => {
-      this.connection.query(
-        `SELECT ${this.details} FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`,
-        [vehicleNo, agencyId],
-        (err, results) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        }
-      );
-    });
+    // await this.createTable(agencyId);
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(
+    //     `SELECT ${this.details} FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`,
+    //     [vehicleNo, agencyId],
+    //     (err, results) => {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(results);
+    //       }
+    //     }
+    //   );
+    // });
   }
 
   async getDataByChassiNumber(chassNo, agencyId) {
-    await this.createTable(agencyId);
-    return new Promise((resolve, reject) => {
-      this.connection.query(
-        `SELECT * FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`,
-        [chassNo, agencyId],
-        (err, results) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        }
-      );
-    });
+    // await this.createTable(agencyId);
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(
+    //     `SELECT * FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`,
+    //     [chassNo, agencyId],
+    //     (err, results) => {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(results);
+    //       }
+    //     }
+    //   );
+    // });
   }
 
   //ensue table exist.
   async initialize() {
-    return new Promise(async (res, rej) => {
-      try {
-        await this.connect();
-      } catch (error) {
-        rej(error);
-      }
-    });
+    // return new Promise(async (res, rej) => {
+    //   try {
+    //     await this.connect();
+    //   } catch (error) {
+    //     rej(error);
+    //   }
+    // });
   }
 
   async addRecords(rows, titles, agencyId, fileName) {
-    await this.createTable(agencyId);
-    let sql = `INSERT INTO ${this.tableName+agencyId} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
-    // let values = jsonList.map(json => [json['ve'], json['ch'], JSON.stringify(json), agencyId]);
-    let values = rows.map((row) => {
-      var json = {};
+    // await this.createTable(agencyId);
+    // let sql = `INSERT INTO ${this.tableName+agencyId} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
+    // // let values = jsonList.map(json => [json['ve'], json['ch'], JSON.stringify(json), agencyId]);
+    // let values = rows.map((row) => {
+    //   var json = {};
 
-      for (let index = 0; index < titles.length; index++) {
-        const title = titles[index];
-        const item = row[index];
-        json[title] = item;
-      }
+    //   for (let index = 0; index < titles.length; index++) {
+    //     const title = titles[index];
+    //     const item = row[index];
+    //     json[title] = item;
+    //   }
 
-      var content = fileName.split("______");
-      json["file name"] = content[0];
-      json["finance"] = content[1];
-      json["branch"] = content[2];
+    //   var content = fileName.split("______");
+    //   json["file name"] = content[0];
+    //   json["finance"] = content[1];
+    //   json["branch"] = content[2];
 
-      var vehicleNumber = json["VEHICAL NO"];
+    //   var vehicleNumber = json["VEHICAL NO"];
 
-      return [
-        //taking the last 4 char of the vehicle number.
-        typeof vehicleNumber === "string" ? vehicleNumber.slice(-4) : undefined,
-        json["CHASSIS NO"],
-        JSON.stringify(json),
-        fileName,
-        agencyId,
-      ];
-    });
+    //   return [
+    //     //taking the last 4 char of the vehicle number.
+    //     typeof vehicleNumber === "string" ? vehicleNumber.slice(-4) : undefined,
+    //     json["CHASSIS NO"],
+    //     JSON.stringify(json),
+    //     fileName,
+    //     agencyId,
+    //   ];
+    // });
 
-    values = values.filter((v) => {
-      if (v[0] === undefined && v[1] === undefined) {
-        return false;
-      }
-      return true;
-    });
+    // values = values.filter((v) => {
+    //   if (v[0] === undefined && v[1] === undefined) {
+    //     return false;
+    //   }
+    //   return true;
+    // });
 
-    return new Promise((resolve, reject) => {
-      if (values.length > 0) {
-        this.connection.query(sql, [values], function (err, result) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        });
-      } else {
-        resolve();
-      }
-    });
+    // return new Promise((resolve, reject) => {
+    //   if (values.length > 0) {
+    //     this.connection.query(sql, [values], function (err, result) {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(result);
+    //       }
+    //     });
+    //   } else {
+    //     resolve();
+    //   }
+    // });
   }
 
   async deleteMatchingRecordsWithVehicleNo(vehicleNo, agencyId) {
-    await this.createTable(agencyId);
-    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`;
-    return new Promise((resolve, reject) => {
-      this.connection.query(sql, [vehicleNo, agencyId], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+    // await this.createTable(agencyId);
+    // const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`;
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(sql, [vehicleNo, agencyId], (error, results) => {
+    //     if (error) {
+    //       reject(error);
+    //     } else {
+    //       resolve(results);
+    //     }
+    //   });
+    // });
   }
 
   async deleteMatchingRecordsWithChassiNo(chassNo, agencyId) {
-    await this.createTable(agencyId);
-    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`;
-    return new Promise((resolve, reject) => {
-      this.connection.query(sql, [chassNo, agencyId], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+    // await this.createTable(agencyId);
+    // const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`;
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(sql, [chassNo, agencyId], (error, results) => {
+    //     if (error) {
+    //       reject(error);
+    //     } else {
+    //       resolve(results);
+    //     }
+    //   });
+    // });
   }
 
   async deleteAllOfaSingleAgency(agencyId) {
-    await this.createTable(agencyId);
-    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.agencyId} = ?`;
-    return new Promise((resolve, reject) => {
-      this.connection.query(sql, [agencyId], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+    // await this.createTable(agencyId);
+    // const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.agencyId} = ?`;
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(sql, [agencyId], (error, results) => {
+    //     if (error) {
+    //       reject(error);
+    //     } else {
+    //       resolve(results);
+    //     }
+    //   });
+    // });
   }
   async deleteAllRecords() {
-    await this.createTable(agencyId);
-    const sql = `DELETE FROM ${this.tableName+agencyId}`;
-    return new Promise((resolve, reject) => {
-      this.connection.query(sql, (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+    // await this.createTable(agencyId);
+    // const sql = `DELETE FROM ${this.tableName+agencyId}`;
+    // return new Promise((resolve, reject) => {
+    //   this.connection.query(sql, (error, results) => {
+    //     if (error) {
+    //       reject(error);
+    //     } else {
+    //       resolve(results);
+    //     }
+    //   });
+    // });
   }
 }
 

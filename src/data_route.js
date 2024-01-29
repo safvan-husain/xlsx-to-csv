@@ -4,6 +4,7 @@ const path = require("path");
 const ensureDirectoryExists = require("./directory_creator.js");
 const generate_download_links = require("./generate_download_links.js");
 const dataRoute = express.Router();
+const generateMissingFileNames = require("./get_missing_files.js")
 
 dataRoute.post("/data", async (req, res) => {
   const agencyId = req.body.agencyId;
@@ -14,8 +15,9 @@ dataRoute.post("/data", async (req, res) => {
       ensureDirectoryExists(`../csv_files/${agencyId}`),
       receivedFiles
     );
+    var deleted = await generateMissingFileNames( ensureDirectoryExists(`../csv_files/${agencyId}`), receivedFiles);
 
-    res.status(200).json({ missingFiles: links });
+    res.status(200).json({ missingFiles: links, deleted: deleted });
   } catch (error) {
     console.log(error);
     console.log("error updating data");
@@ -23,7 +25,7 @@ dataRoute.post("/data", async (req, res) => {
   }
 });
 
-dataRoute.post("/delete", async (req, res) => {
+dataRoute.post("/delete", async (req, res) => { 
   const agencyId = req.body.agencyId;
   const filenames = req.body.filenames;
 
