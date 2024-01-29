@@ -48,28 +48,43 @@ class MyRemoteSql {
     });
   }
 
-  async createTable() {
+  async createTable(agencyId) {
     return new Promise((res, rej) => {
       this.connection.query(
-        `CREATE TABLE ${this.tableName} (
-        ${this.vehicleNo} VARCHAR(255),
-        ${this.chassNo} VARCHAR(255),
-        ${this.details} JSON,
-        ${this.fileName} VARCHAR(255),
-        ${this.agencyId} VARCHAR(255)
-    )`,
-        function (err, results) {
+        `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
+        async function (err, results) {
           if (err) rej(err);
-          res(results);
-        }
+          if (results[0]["COUNT(*)"] > 0) {
+            console.log("table exist");
+            // await this.logAllDataFromTable();
+            res();
+          } else {
+            this.connection.query(
+              `CREATE TABLE ${this.tableName+agencyId} (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              ${this.vehicleNo} VARCHAR(255),
+              ${this.chassNo} VARCHAR(255),
+              ${this.details} JSON,
+              ${this.fileName} VARCHAR(255),
+              ${this.agencyId} VARCHAR(255)
+          )`,
+              function (err, results) {
+                if (err) rej(err);
+                res(results);
+              }
+            );
+            res();
+          }
+        }.bind(this)
       );
     });
   }
 
-  async logAllDataFromTable() {
+  async logAllDataFromTable(agencyId) {
+    await this.createTable(agencyId);
     return new Promise((resolve, reject) => {
       this.connection.query(
-        `SELECT * FROM ${this.tableName}`,
+        `SELECT * FROM ${this.tableName+agencyId}`,
         (err, results) => {
           if (err) {
             reject(err);
@@ -83,9 +98,10 @@ class MyRemoteSql {
   }
 
   async getDataByVehicleNumber(vehicleNo, agencyId) {
+    await this.createTable(agencyId);
     return new Promise((resolve, reject) => {
       this.connection.query(
-        `SELECT ${this.details} FROM ${this.tableName} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`,
+        `SELECT ${this.details} FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`,
         [vehicleNo, agencyId],
         (err, results) => {
           if (err) {
@@ -99,9 +115,10 @@ class MyRemoteSql {
   }
 
   async getDataByChassiNumber(chassNo, agencyId) {
+    await this.createTable(agencyId);
     return new Promise((resolve, reject) => {
       this.connection.query(
-        `SELECT * FROM ${this.tableName} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`,
+        `SELECT * FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`,
         [chassNo, agencyId],
         (err, results) => {
           if (err) {
@@ -119,21 +136,6 @@ class MyRemoteSql {
     return new Promise(async (res, rej) => {
       try {
         await this.connect();
-
-        this.connection.query(
-          `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName}'`,
-          async function (err, results) {
-            if (err) rej(err);
-            if (results[0]["COUNT(*)"] > 0) {
-              console.log("table exist");
-              // await this.logAllDataFromTable();
-              res();
-            } else {
-              await this.createTable();
-              res();
-            }
-          }.bind(this)
-        );
       } catch (error) {
         rej(error);
       }
@@ -141,7 +143,8 @@ class MyRemoteSql {
   }
 
   async addRecords(rows, titles, agencyId, fileName) {
-    let sql = `INSERT INTO ${this.tableName} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
+    await this.createTable(agencyId);
+    let sql = `INSERT INTO ${this.tableName+agencyId} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
     // let values = jsonList.map(json => [json['ve'], json['ch'], JSON.stringify(json), agencyId]);
     let values = rows.map((row) => {
       var json = {};
@@ -192,7 +195,8 @@ class MyRemoteSql {
   }
 
   async deleteMatchingRecordsWithVehicleNo(vehicleNo, agencyId) {
-    const sql = `DELETE FROM ${this.tableName} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`;
+    await this.createTable(agencyId);
+    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.vehicleNo} = ? AND ${this.agencyId} = ?`;
     return new Promise((resolve, reject) => {
       this.connection.query(sql, [vehicleNo, agencyId], (error, results) => {
         if (error) {
@@ -205,7 +209,8 @@ class MyRemoteSql {
   }
 
   async deleteMatchingRecordsWithChassiNo(chassNo, agencyId) {
-    const sql = `DELETE FROM ${this.tableName} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`;
+    await this.createTable(agencyId);
+    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.chassNo} = ? AND ${this.agencyId} = ?`;
     return new Promise((resolve, reject) => {
       this.connection.query(sql, [chassNo, agencyId], (error, results) => {
         if (error) {
@@ -218,7 +223,8 @@ class MyRemoteSql {
   }
 
   async deleteAllOfaSingleAgency(agencyId) {
-    const sql = `DELETE FROM ${this.tableName} WHERE ${this.agencyId} = ?`;
+    await this.createTable(agencyId);
+    const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.agencyId} = ?`;
     return new Promise((resolve, reject) => {
       this.connection.query(sql, [agencyId], (error, results) => {
         if (error) {
@@ -230,7 +236,8 @@ class MyRemoteSql {
     });
   }
   async deleteAllRecords() {
-    const sql = `DELETE FROM ${this.tableName}`;
+    await this.createTable(agencyId);
+    const sql = `DELETE FROM ${this.tableName+agencyId}`;
     return new Promise((resolve, reject) => {
       this.connection.query(sql, (error, results) => {
         if (error) {
