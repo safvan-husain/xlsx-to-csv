@@ -23,13 +23,13 @@ class MyRemoteSql {
   connection = mysql.createConnection({
     host: "85.187.128.49",
     // host: "192.168.107.67",
-    user: "starkina_recovery",
+    user: "starkina_recovery", 
     password: "t7Oug+e7r)NZ",
     // password: "H[FlB$hctRF[",
     database: this.databaseName,
   });
 
-  async connect() {
+  async connect() { 
     // return new Promise((res, rej) => {
     //   this.connection.connect(
     //     function (err, result) {
@@ -43,7 +43,7 @@ class MyRemoteSql {
     // });
   }
 
-  async createTable(agencyId) {
+  async createTable(agencyId) { 
     // return new Promise((res, rej) => {
     //   this.connection.query(
     //     `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
@@ -75,7 +75,7 @@ class MyRemoteSql {
     // });
   }
 
-  async logAllDataFromTable(agencyId) {
+  async logAllDataFromTable(agencyId) { 
     // await this.createTable(agencyId);
     // return new Promise((resolve, reject) => {
     //   this.connection.query(
@@ -92,7 +92,7 @@ class MyRemoteSql {
     // });
   }
 
-  async getDataByVehicleNumber(vehicleNo, agencyId) {
+  async getDataByVehicleNumber(vehicleNo, agencyId) { 
     // await this.createTable(agencyId);
     // return new Promise((resolve, reject) => {
     //   this.connection.query(
@@ -123,7 +123,7 @@ class MyRemoteSql {
     //       }
     //     }
     //   );
-    // });
+    // }); 
   }
 
   //ensue table exist.
@@ -138,6 +138,7 @@ class MyRemoteSql {
   }
 
   async addRecords(rows, titles, agencyId, fileName) {
+    // console.log(`add records called ${rows.length}`); 
     // await this.createTable(agencyId);
     // let sql = `INSERT INTO ${this.tableName+agencyId} (${this.vehicleNo}, ${this.chassNo}, ${this.details}, ${this.fileName},${this.agencyId}) VALUES ?`;
     // // let values = jsonList.map(json => [json['ve'], json['ch'], JSON.stringify(json), agencyId]);
@@ -155,7 +156,7 @@ class MyRemoteSql {
     //   json["finance"] = content[1];
     //   json["branch"] = content[2];
 
-    //   var vehicleNumber = json["VEHICAL NO"];
+    //   var vehicleNumber = json["VEHICAL NO"]?? json["VEHICAL NO".toLowerCase()]?? json["VEHICLENO"]?? json["VEHICLENO".toLowerCase()]?? json["VEHICLE NO"]?? json["VEHICLE NO".toLowerCase()];
 
     //   return [
     //     //taking the last 4 char of the vehicle number.
@@ -165,21 +166,16 @@ class MyRemoteSql {
     //     fileName,
     //     agencyId,
     //   ];
-    // });
-
-    // values = values.filter((v) => {
-    //   if (v[0] === undefined && v[1] === undefined) {
-    //     return false;
-    //   }
-    //   return true;
-    // });
+    // }); 
 
     // return new Promise((resolve, reject) => {
     //   if (values.length > 0) {
     //     this.connection.query(sql, [values], function (err, result) {
     //       if (err) {
+    //         console.log(err);
     //         reject(err);
     //       } else {
+    //         console.log(result);
     //         resolve(result);
     //       }
     //     });
@@ -215,22 +211,24 @@ class MyRemoteSql {
     //     }
     //   });
     // });
-  }
+   }
 
-  async deleteAllOfaSingleAgency(agencyId) {
+  async deleteAllOfaSingleAgencyFile(agencyId, fileName) {
     // await this.createTable(agencyId);
-    // const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.agencyId} = ?`;
+    // const sql = `DELETE FROM ${this.tableName+agencyId} WHERE ${this.fileName} = ?`;
     // return new Promise((resolve, reject) => {
-    //   this.connection.query(sql, [agencyId], (error, results) => {
+    //   this.connection.query(sql, [fileName], (error, results) => {
     //     if (error) {
+    //       console.log(error); 
     //       reject(error);
     //     } else {
     //       resolve(results);
     //     }
     //   });
     // });
-  }
-  async deleteAllRecords() {
+   }
+
+  async deleteAllRecords() { 
     // await this.createTable(agencyId);
     // const sql = `DELETE FROM ${this.tableName+agencyId}`;
     // return new Promise((resolve, reject) => {

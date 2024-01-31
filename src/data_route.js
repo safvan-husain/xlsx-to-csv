@@ -4,7 +4,10 @@ const path = require("path");
 const ensureDirectoryExists = require("./directory_creator.js");
 const generate_download_links = require("./generate_download_links.js");
 const dataRoute = express.Router();
-const generateMissingFileNames = require("./get_missing_files.js")
+const generateMissingFileNames = require("./get_missing_files.js");
+const MyRemoteSql = require("./db/mysql_helper.js");
+
+let myRemoteSqlInstance = MyRemoteSql.getInstance();
 
 dataRoute.post("/data", async (req, res) => {
   const agencyId = req.body.agencyId;
@@ -15,7 +18,10 @@ dataRoute.post("/data", async (req, res) => {
       ensureDirectoryExists(`../csv_files/${agencyId}`),
       receivedFiles
     );
-    var deleted = await generateMissingFileNames( ensureDirectoryExists(`../csv_files/${agencyId}`), receivedFiles);
+    var deleted = await generateMissingFileNames(
+      ensureDirectoryExists(`../csv_files/${agencyId}`),
+      Object.keys(receivedFiles)
+    );
 
     res.status(200).json({ missingFiles: links, deleted: deleted });
   } catch (error) {
@@ -25,29 +31,28 @@ dataRoute.post("/data", async (req, res) => {
   }
 });
 
-dataRoute.post("/delete", async (req, res) => { 
+dataRoute.post("/delete", async (req, res) => {
   const agencyId = req.body.agencyId;
-  const filenames = req.body.filenames;
+  const filename = req.body.filename;
 
   try {
+    myRemoteSqlInstance.deleteAllOfaSingleAgencyFile(agencyId, filename);
     // Ensure the directory exists
     const dir = path.join(__dirname, "..", "csv_files", agencyId);
     if (!fs.existsSync(dir)) {
-      return res.status(404).json({ message: "Directory does not exist." });
+      return  res.status(200).json({ message: "Files deleted successfully." });
     }
 
     const filesInDir = fs.readdirSync(dir);
 
-    // Delete each file
-    for (let filename of filenames) {
-      const matchingFiles = filesInDir.filter((file) =>
-        file.startsWith(`${filename}_____`)
-      );
-      for (let matchingFile of matchingFiles) {
-        const filePath = path.join(dir, matchingFile);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
+    // Delete file
+    const matchingFiles = filesInDir.filter((file) =>
+      file.startsWith(`${filename}_____`)
+    );
+    for (let matchingFile of matchingFiles) {
+      const filePath = path.join(dir, matchingFile);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
       }
     }
 
@@ -58,6 +63,6 @@ dataRoute.post("/delete", async (req, res) => {
       .status(500)
       .json({ message: "An error occurred while deleting the files." });
   }
-}); 
+});
 
 module.exports = { dataRoute };
