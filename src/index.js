@@ -17,7 +17,7 @@ const { dataRoute } = require("./data_route.js");
 const dotenv = require("dotenv");
 const MyRemoteSql = require("./db/mysql_helper.js");
 const { json } = require("body-parser");
-
+const { copy_file } = require("./copy_file.js");
 const database = MyRemoteSql.getInstance();
 
 dotenv.config();
@@ -35,6 +35,73 @@ app.get("/", (req, res) => {
   res.send("Hello World new!");
 });
 
+
+app.get("/download/:filename", (req, res) => {
+  const filePath =  req.params.filename;
+  res.download(filePath, (err) => {
+      if (err) {
+          res.status(500).send({
+              error: err,
+              msg: "Problem downloading the file"
+          });
+      }
+  });
+});
+
+app.post("/upload2", express.json(), async (req, res) => {
+  console.log("Links received");
+  console.time("Total Time");
+
+  const fileLinks = req.body.fileLinks; // Assuming the payload has a `fileLinks` array
+  const agencyId = req.body.agencyId;
+  if (fileLinks && fileLinks.length > 0) {
+    // console.log(fileLinks);
+    let filepath;
+    let filename;
+    try {
+      for (const fileLink of fileLinks) {
+        // Download each file
+        try {
+          
+          // Create a unique filename for the downloaded file
+          filename = path.basename(fileLink, ".xlsx");
+          
+          filepath =
+          ensureDirectoryExists(`../uploads/${agencyId}/`) + filename;
+          
+          await copy_file(`/var/www/recovery.starkinhost.com/${fileLink}`, filepath);
+     
+
+        
+        } catch (error) {
+          if (error.code === "ECONNRESET") {
+            console.log("Connection reset by peer");
+          } else {
+            console.error("Error copying file:", error);
+          }
+        }
+      }
+      res.status(200).send("Congrats, files downloaded and processed");
+    } catch (error) {
+      console.error("Error downloading files:", error);
+      res.status(500).send("Error downloading files");
+    }
+
+    try {
+      await xlsxToCsv(filepath, filename, agencyId);
+      console.log(`${filepath} coverted successfully`);
+      fs.unlinkSync(filepath);
+    } catch (err) {
+      console.log(`error converting ${filepath}`);
+
+      console.log(err);
+    }
+  } else {
+    res.status(400).json({ message: "No file links provided" });
+  }
+
+  console.timeEnd("Total Time");
+});
 app.post("/upload", express.json(), async (req, res) => {
   console.log("Links received");
   console.time("Total Time");

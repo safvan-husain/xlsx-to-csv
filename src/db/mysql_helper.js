@@ -44,35 +44,35 @@ class MyRemoteSql {
   }
 
   async createTable(agencyId) { 
-    // return new Promise((res, rej) => {
-    //   this.connection.query(
-    //     `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
-    //     async function (err, results) {
-    //       if (err) rej(err);
-    //       if (results[0]["COUNT(*)"] > 0) {
-    //         console.log("table exist");
-    //         // await this.logAllDataFromTable();
-    //         res();
-    //       } else {
-    //         this.connection.query(
-    //           `CREATE TABLE ${this.tableName+agencyId} (
-    //           id INT AUTO_INCREMENT PRIMARY KEY,
-    //           ${this.vehicleNo} VARCHAR(255),
-    //           ${this.chassNo} VARCHAR(255),
-    //           ${this.details} JSON,
-    //           ${this.fileName} VARCHAR(255),
-    //           ${this.agencyId} VARCHAR(255)
-    //       )`,
-    //           function (err, results) {
-    //             if (err) rej(err);
-    //             res(results);
-    //           }
-    //         );
-    //         res();
-    //       }
-    //     }.bind(this)
-    //   );
-    // });
+    return new Promise((res, rej) => {
+      this.connection.query(
+        `SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${this.databaseName}' AND table_name = '${this.tableName+agencyId}'`,
+        async function (err, results) {
+          if (err) rej(err);
+          if (results[0]["COUNT(*)"] > 0) {
+            console.log("table exist");
+            // await this.logAllDataFromTable();
+            res();
+          } else {
+            this.connection.query(
+              `CREATE TABLE ${this.tableName+agencyId} (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              ${this.vehicleNo} VARCHAR(255),
+              ${this.chassNo} VARCHAR(255),
+              ${this.details} JSON,
+              ${this.fileName} VARCHAR(255),
+              ${this.agencyId} VARCHAR(255)
+          )`,
+              function (err, results) {
+                if (err) rej(err);
+                res(results);
+              }
+            );
+            res();
+          }
+        }.bind(this)
+      );
+    });
   }
 
   async logAllDataFromTable(agencyId) { 

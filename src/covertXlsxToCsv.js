@@ -79,7 +79,6 @@ module.exports = async function xlsxToCsv(inputFilePath, fileName, agencyId) {
             }
             // if(str.includes("/")) {
             // }
-            console.log(str);
             return str.toLowerCase().replaceAll("\n", "").replaceAll("\r", "");
           });
 
